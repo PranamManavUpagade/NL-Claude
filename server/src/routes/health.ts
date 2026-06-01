@@ -10,7 +10,7 @@ healthRouter.get('/health', (_req, res) => {
     llm: GEMINI_MODEL,
     geminiConfigured: Boolean(
       process.env.GEMINI_API_KEY &&
-        process.env.GEMINI_API_KEY !== 'your_gemini_api_key_here'
+        process.env.GEMINI_API_KEY !== 'AIzaSyDKmpRKQzz1TSM6Z2H4DooU5aTHNdWZVUk'
     ),
   });
 });
