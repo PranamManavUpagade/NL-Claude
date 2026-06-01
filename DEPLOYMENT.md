@@ -5,13 +5,13 @@ This document captures the minimal steps and files added to deploy the project w
 1) Frontend (Vercel)
 
 - Files added:
-  - `client/vercel.json` — example rewrite to proxy `/api/*` to your API host (replace `YOUR_API_HOST`).
-  - `client/.env.example` — set `VITE_API_BASE` to the API host (no trailing slash).
+  - `client/vercel.json` — rewrite proxy to `https://nl-claude-8hkkavsygpqkn5z24r9fvu.streamlit.app/api`.
+  - `client/.env.example` — set `VITE_API_BASE` to the Streamlit backend base URL (no trailing slash).
 
 - Steps:
   - Connect `client/` as a project on Vercel (select the monorepo and point the root to `client`).
-  - In Vercel Project Settings → Environment Variables, add `VITE_API_BASE` with value `https://api.example.com` (replace).
-  - (Optional) Add rewrites in `vercel.json` to proxy `/api/*` to your backend.
+  - In Vercel Project Settings → Environment Variables, add `VITE_API_BASE` with value `https://nl-claude-8hkkavsygpqkn5z24r9fvu.streamlit.app`.
+  - (Optional) Verify `client/vercel.json` rewrites `/api/*` to the Streamlit backend.
   - Deploy and verify `https://<your-vercel-app>/api/v1/health` returns the expected JSON.
 
 2) Backend (Streamlit wrapper + Express API)
@@ -27,7 +27,7 @@ This document captures the minimal steps and files added to deploy the project w
 - Steps (Streamlit Cloud):
   - Push `server/streamlit_app.py` and `server/requirements.txt` to GitHub.
   - Create a Streamlit app in Streamlit Cloud pointing to `server/streamlit_app.py`.
-  - Set `SERVER_API_URL` secret in Streamlit secrets to the public API URL (e.g. `https://api.example.com/api/v1`).
+  - Set `SERVER_API_URL` secret in Streamlit secrets to the public API URL (e.g. `https://nl-claude-8hkkavsygpqkn5z24r9fvu.streamlit.app/api/v1`).
   - Verify the monitoring app can fetch the `/health` endpoint.
 
 3) CORS & env

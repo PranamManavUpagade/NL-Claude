@@ -816,7 +816,7 @@ This project uses a split deployment strategy: the backend will be exposed via a
 - **Frontend — Vercel (static site hosting for `client/`)**
     - Project root on Vercel: set to `client/`.
     - Build command: `npm run build` (from the `client/` directory). Output directory: `dist` (Vite default).
-    - Environment variables (set in Vercel project Settings → Environment Variables): set `VITE_API_BASE` (or `REACT_APP_API_URL`) to the production API URL (the Streamlit app's public host or separate API host). The current client uses relative `/api/v1` paths; for production prefer an absolute API base and set it in `client/.env.production` or Vercel env vars.
+    - Environment variables (set in Vercel project Settings → Environment Variables): set `VITE_API_BASE` to `https://nl-claude-8hkkavsygpqkn5z24r9fvu.streamlit.app`. The current client uses relative `/api/v1` paths; for production prefer an absolute API base and set it in `client/.env.production` or Vercel env vars.
     - CORS / Proxy: if the frontend is served from a different origin than the API, ensure the backend allows CORS for the frontend origin. Alternatively configure Vercel rewrites to proxy `/api/*` to the backend.
     - Deploy steps (Vercel):
         1. Connect the GitHub repo to Vercel and import the project, choose the `client/` directory as the root.

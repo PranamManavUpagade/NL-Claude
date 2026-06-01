@@ -4,7 +4,12 @@ import streamlit as st
 
 # Simple Streamlit monitoring/admin wrapper for the backend API
 
-API_BASE = os.environ.get("SERVER_API_URL", "http://localhost:3001/api/v1")
+raw_api_base = os.environ.get("SERVER_API_URL", "https://nl-claude-8hkkavsygpqkn5z24r9fvu.streamlit.app")
+api_base = raw_api_base.rstrip('/')
+if not api_base.endswith('/api/v1'):
+    api_base = f"{api_base}/api/v1"
+
+API_BASE = api_base
 
 st.set_page_config(page_title="Calibrate — Backend Monitor", layout="centered")
 
