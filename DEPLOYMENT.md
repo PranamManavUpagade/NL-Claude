@@ -5,13 +5,13 @@ This document captures the minimal steps and files added to deploy the project w
 1) Frontend (Vercel)
 
 - Files added:
-  - `client/vercel.json` — rewrite proxy to `https://nl-claude-8hkkavsygpqkn5z24r9fvu.streamlit.app/api`.
-  - `client/.env.example` — set `VITE_API_BASE` to the Streamlit backend base URL (no trailing slash).
+  - `client/vercel.json` — rewrite proxy to the backend host configured in `VITE_API_BASE`.
+  - `client/.env.example` — set `VITE_API_BASE` to the actual backend API host (no trailing slash).
 
 - Steps:
   - Connect `client/` as a project on Vercel (select the monorepo and point the root to `client`).
   - In Vercel Project Settings → Environment Variables, add `VITE_API_BASE` with the actual backend API host (for example `https://<your-api-host>`).
-  - (Optional) Verify `client/vercel.json` rewrites `/api/*` to the Streamlit backend.
+  - Verify that `client/vercel.json` rewrites `/api/*` to the API host configured in `VITE_API_BASE`.
   - Deploy and verify `https://<your-vercel-app>/api/v1/health` returns the expected JSON.
 
 2) Backend (Streamlit wrapper + Express API)
