@@ -1,11 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { createEvaluation, type EvaluationResponse } from '../services/api';
 import analytics from '../services/analytics';
 import EvaluationResults from '../components/EvaluationResults';
 
 export default function NewEvaluation() {
-  const navigate = useNavigate();
   const [aiOutput, setAiOutput] = useState('');
   const [userIntent, setUserIntent] = useState('');
   const [stakes, setStakes] = useState(3);
