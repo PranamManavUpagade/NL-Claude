@@ -1,4 +1,4 @@
-import type { EvaluationPackage, VerdictPackage } from './orchestrator.js';
+import type { EvaluationPackage, VerdictPayload } from './orchestrator.js';
 
 const evaluationStore = new Map<string, EvaluationPackage>();
 
@@ -7,7 +7,7 @@ export interface EvaluationSummary {
   status: string;
   model: string;
   created_at: string;
-  verdict?: VerdictPackage;
+  verdict?: VerdictPayload;
 }
 
 export function saveEvaluation(evaluation: EvaluationPackage) {
@@ -31,7 +31,7 @@ export function listEvaluations(): EvaluationSummary[] {
   );
 }
 
-export function saveVerdict(evaluationId: string, verdict: VerdictPackage) {
+export function saveVerdict(evaluationId: string, verdict: VerdictPayload) {
   const evaluation = evaluationStore.get(evaluationId);
   if (!evaluation) {
     return null;
