@@ -5,7 +5,7 @@ export const GEMINI_MODEL = 'gemini-2.5-flash';
 
 function getApiKey(): string {
   const key = process.env.GEMINI_API_KEY;
-  if (!key || key === 'your_gemini_api_key_here') {
+  if (!key || key === 'AIzaSyDKmpRKQzz1TSM6Z2H4DooU5aTHNdWZVUk') {
     throw new Error(
       'GEMINI_API_KEY is missing. Copy server/.env.example to server/.env and add your key.'
     );
