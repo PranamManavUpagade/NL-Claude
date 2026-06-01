@@ -32,7 +32,6 @@ export default function NewEvaluation() {
       });
       setEvaluation(data);
       analytics.track('evaluation_complete', { evaluationId: data.evaluation_id });
-      navigate(`/evaluate/${data.evaluation_id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Request failed');
     } finally {
