@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://${env:VITE_API_BASE}/api/$1"
+      "destination": "${env:VITE_API_BASE}/api/$1"
     }
   ]
 }
