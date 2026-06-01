@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://nl-claude-8hkkavsygpqkn5z24r9fvu.streamlit.app/api/$1"
+      "destination": "https://<your-api-host>/api/$1"
     }
   ]
 }

@@ -10,7 +10,7 @@ This document captures the minimal steps and files added to deploy the project w
 
 - Steps:
   - Connect `client/` as a project on Vercel (select the monorepo and point the root to `client`).
-  - In Vercel Project Settings → Environment Variables, add `VITE_API_BASE` with value `https://nl-claude-8hkkavsygpqkn5z24r9fvu.streamlit.app`.
+  - In Vercel Project Settings → Environment Variables, add `VITE_API_BASE` with the actual backend API host (for example `https://<your-api-host>`).
   - (Optional) Verify `client/vercel.json` rewrites `/api/*` to the Streamlit backend.
   - Deploy and verify `https://<your-vercel-app>/api/v1/health` returns the expected JSON.
 
@@ -27,7 +27,7 @@ This document captures the minimal steps and files added to deploy the project w
 - Steps (Streamlit Cloud):
   - Push `server/streamlit_app.py` and `server/requirements.txt` to GitHub.
   - Create a Streamlit app in Streamlit Cloud pointing to `server/streamlit_app.py`.
-  - Set `SERVER_API_URL` secret in Streamlit secrets to the public API URL (e.g. `https://nl-claude-8hkkavsygpqkn5z24r9fvu.streamlit.app/api/v1`).
+  - Set `SERVER_API_URL` secret in Streamlit secrets to the public API URL (e.g. `https://<your-api-host>/api/v1`).
   - Verify the monitoring app can fetch the `/health` endpoint.
 
 3) CORS & env
