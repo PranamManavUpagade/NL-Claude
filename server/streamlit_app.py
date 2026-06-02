@@ -38,10 +38,34 @@ def init_gemini():
     genai.configure(api_key=get_api_key())
 
 
-def build_prompt(dimension: str, context: dict) -> str:
-    return f"""You are an assistive evaluation engine for Calibrate. Do NOT provide a single trust score, verdict, or recommendation. Return only valid JSON.
+def build_combined_prompt(context: dict) -> str:
+    instructions_block = "\n".join([f"- {d.upper()}: {instr}" for d, instr in DIMENSION_INSTRUCTIONS.items()])
+    expected_shapes = """{
+  "correctness": {
+    "claims": ["string"],
+    "warnings": ["string"]
+  },
+  "completeness": {
+    "gaps": ["string"],
+    "risks": ["string"]
+  },
+  "reasoning": {
+    "steps": ["string"],
+    "weaknesses": ["string"]
+  },
+  "usefulness": {
+    "alignment": "high|medium|low",
+    "rationale": "string"
+  },
+  "uncertainty": {
+    "items": ["string"]
+  }
+}"""
+    return f"""You are an assistive evaluation engine for Calibrate. Do NOT provide a single trust score, verdict, or recommendation. Evaluate the AI output on all five dimensions listed below.
+Return only valid JSON.
 
-Task: {DIMENSION_INSTRUCTIONS[dimension]}
+Dimensions to evaluate:
+{instructions_block}
 
 User intent: {context['user_intent']}
 Stakes: {context['stakes_level']}
@@ -51,19 +75,9 @@ Mode: {context['mode']}
 AI output:
 {context['ai_output']}
 
-Return JSON with the following shape for {dimension}:
-{get_expected_response_shape(dimension)}
+Return a single JSON object with the following schema:
+{expected_shapes}
 """
-
-
-def get_expected_response_shape(dimension: str) -> str:
-    return {
-        "correctness": '{"claims": ["string"], "warnings": ["string"]}',
-        "completeness": '{"gaps": ["string"], "risks": ["string"]}',
-        "reasoning": '{"steps": ["string"], "weaknesses": ["string"]}',
-        "usefulness": '{"alignment": "high|medium|low", "rationale": "string"}',
-        "uncertainty": '{"items": ["string"]}',
-    }[dimension]
 
 
 def parse_json_response(raw: str) -> dict:
@@ -105,20 +119,67 @@ def generate_text(prompt: str) -> str:
     return getattr(response, "text", str(response))
 
 
-def evaluate_dimension(dimension: str, context: dict) -> dict:
-    prompt = build_prompt(dimension, context)
+def run_evaluation(context: dict) -> dict:
+    prompt = build_combined_prompt(context)
     raw = generate_text(prompt)
     payload = parse_json_response(raw)
-    return {"dimension": dimension, "trace": prompt, "raw": raw, "payload": payload}
-
-
-def run_evaluation(context: dict) -> dict:
-    results = [evaluate_dimension(d, context) for d in DIMENSION_INSTRUCTIONS.keys()]
+    
+    # Defaults in case the LLM misses any keys
+    default_payloads = {
+        "correctness": {"claims": [], "warnings": []},
+        "completeness": {"gaps": [], "risks": []},
+        "reasoning": {"steps": [], "weaknesses": []},
+        "usefulness": {"alignment": "medium", "rationale": ""},
+        "uncertainty": {"items": []}
+    }
+    
+    results = {}
+    for d in DIMENSION_INSTRUCTIONS.keys():
+        # Get the dimension sub-object from payload, falling back to default
+        dim_payload = payload.get(d, default_payloads[d])
+        # Ensure it has the correct nested properties
+        if d == "correctness":
+            if not isinstance(dim_payload, dict): dim_payload = {}
+            dim_payload = {
+                "claims": dim_payload.get("claims", []),
+                "warnings": dim_payload.get("warnings", [])
+            }
+        elif d == "completeness":
+            if not isinstance(dim_payload, dict): dim_payload = {}
+            dim_payload = {
+                "gaps": dim_payload.get("gaps", []),
+                "risks": dim_payload.get("risks", [])
+            }
+        elif d == "reasoning":
+            if not isinstance(dim_payload, dict): dim_payload = {}
+            dim_payload = {
+                "steps": dim_payload.get("steps", []),
+                "weaknesses": dim_payload.get("weaknesses", [])
+            }
+        elif d == "usefulness":
+            if not isinstance(dim_payload, dict): dim_payload = {}
+            dim_payload = {
+                "alignment": dim_payload.get("alignment", "medium"),
+                "rationale": dim_payload.get("rationale", "")
+            }
+        elif d == "uncertainty":
+            if not isinstance(dim_payload, dict): dim_payload = {}
+            dim_payload = {
+                "items": dim_payload.get("items", [])
+            }
+            
+        results[d] = {
+            "dimension": d,
+            "trace": prompt,
+            "raw": raw,
+            "payload": dim_payload
+        }
+        
     return {
         "evaluation_id": os.urandom(16).hex(),
         "model": MODEL,
         "created_at": datetime.utcnow().isoformat() + "Z",
-        "dimensions": {result["dimension"]: result for result in results},
+        "dimensions": results,
     }
 
 
