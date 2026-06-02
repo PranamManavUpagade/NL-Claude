@@ -77,22 +77,26 @@ def parse_json_response(raw: str) -> dict:
 
 def generate_text(prompt: str) -> str:
     init_gemini()
-    if hasattr(genai, "get_model"):
-        model = genai.get_model(MODEL)
-        if hasattr(model, "generate_text"):
-            response = model.generate_text(prompt=prompt)
-        elif hasattr(model, "predict"):
-            response = model.predict(prompt=prompt)
-        else:
-            raise RuntimeError("Unsupported Gemini model API: no generate_text or predict method")
-    elif hasattr(genai, "GenerativeModel"):
+    if hasattr(genai, "GenerativeModel"):
         model = genai.GenerativeModel(MODEL)
-        if hasattr(model, "generate_text"):
+        if hasattr(model, "generate_content"):
+            response = model.generate_content(prompt)
+        elif hasattr(model, "generate_text"):
             response = model.generate_text(prompt)
         elif hasattr(model, "predict"):
             response = model.predict(prompt)
         else:
-            raise RuntimeError("Unsupported Gemini model API: no generate_text or predict method")
+            raise RuntimeError("Unsupported Gemini model API: no generate_content, generate_text or predict method")
+    elif hasattr(genai, "get_model"):
+        model = genai.get_model(MODEL)
+        if hasattr(model, "generate_content"):
+            response = model.generate_content(prompt=prompt)
+        elif hasattr(model, "generate_text"):
+            response = model.generate_text(prompt=prompt)
+        elif hasattr(model, "predict"):
+            response = model.predict(prompt=prompt)
+        else:
+            raise RuntimeError("Unsupported Gemini model API: no generate_content, generate_text or predict method")
     else:
         raise RuntimeError("Unsupported google.generativeai package API; please upgrade the package")
 
