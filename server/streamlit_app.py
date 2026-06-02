@@ -77,7 +77,25 @@ def parse_json_response(raw: str) -> dict:
 
 def generate_text(prompt: str) -> str:
     init_gemini()
-    response = genai.generate_text(model=MODEL, prompt=prompt)
+    if hasattr(genai, "get_model"):
+        model = genai.get_model(MODEL)
+        if hasattr(model, "generate_text"):
+            response = model.generate_text(prompt=prompt)
+        elif hasattr(model, "predict"):
+            response = model.predict(prompt=prompt)
+        else:
+            raise RuntimeError("Unsupported Gemini model API: no generate_text or predict method")
+    elif hasattr(genai, "GenerativeModel"):
+        model = genai.GenerativeModel(MODEL)
+        if hasattr(model, "generate_text"):
+            response = model.generate_text(prompt)
+        elif hasattr(model, "predict"):
+            response = model.predict(prompt)
+        else:
+            raise RuntimeError("Unsupported Gemini model API: no generate_text or predict method")
+    else:
+        raise RuntimeError("Unsupported google.generativeai package API; please upgrade the package")
+
     if isinstance(response, dict):
         return response.get("text", json.dumps(response))
     return getattr(response, "text", str(response))

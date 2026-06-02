@@ -5,14 +5,13 @@ This document captures the minimal steps and files added to deploy the project w
 1) Frontend (Vercel)
 
 - Files added:
-  - `client/vercel.json` — rewrite proxy to the backend host configured in `VITE_API_BASE`.
   - `client/.env.example` — set `VITE_API_BASE` to the actual backend API host (no trailing slash).
 
 - Steps:
   - Connect `client/` as a project on Vercel (select the monorepo and point the root to `client`).
   - In Vercel Project Settings → Environment Variables, add `VITE_API_BASE` with the actual backend API host (for example `https://<your-api-host>`).
-  - Verify that `client/vercel.json` rewrites `/api/*` to the API host configured in `VITE_API_BASE`.
-  - Deploy and verify `https://<your-vercel-app>/api/v1/health` returns the expected JSON.
+  - The client will directly make requests to the absolute backend URL compiled from `VITE_API_BASE` (no rewrite proxy required).
+  - Deploy and verify that the application communicates successfully with the backend.
 
 2) Backend (Streamlit wrapper + Express API)
 
@@ -36,5 +35,5 @@ This document captures the minimal steps and files added to deploy the project w
 
 4) Notes & next steps
 
-- If you want a single host for both UI and API, consider hosting the Express API on a Node host and using Vercel rewrites to proxy calls, or use Render to host both services.
-- I can add GitHub Actions for automated deploys to Vercel and Streamlit (or create a `vercel.json` with more precise rewrites). Tell me which automation you'd like next.
+- If you want a single host for both UI and API, consider hosting the Express API on a Node host and configure the client to communicate with it, or use Render to host both services.
+- I can add GitHub Actions for automated deploys to Vercel and Streamlit. Tell me which automation you'd like next.
